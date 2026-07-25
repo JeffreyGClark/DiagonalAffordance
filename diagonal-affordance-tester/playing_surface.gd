@@ -1,5 +1,12 @@
 extends Node2D
 
+# nodes
+@onready var _Direction: Sprite2D = $"./Direction";
+
+# textures
+const RArrow: Texture2D = preload("res://RArrow.png");
+const URArrow: Texture2D = preload("res://URArrow.png");
+
 var allow_input: bool = true;
 
 enum directions {
@@ -114,4 +121,14 @@ func update_deck_display():
 			current_direction = deck[position_in_deck];
 		else:
 			return;
+  
+	if (current_direction % 2 == 0):
+		_Direction.texture = RArrow;
+		_Direction.rotation_degrees = data[current_direction].angle_degrees;
+	else:
+		_Direction.texture = URArrow;
+		_Direction.rotation_degrees = data[current_direction].angle_degrees + 45.0;
+
+	
 	print(position_in_deck, " ", current_direction);
+	print("  ", _Direction.position);
