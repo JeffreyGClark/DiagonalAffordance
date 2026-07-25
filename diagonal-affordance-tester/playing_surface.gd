@@ -13,6 +13,14 @@ enum directions {
 	dr
 }
 
+var current_direction = directions.r;
+
+var sample_deck: Array[directions] = [
+	directions.r, directions.dl, directions.u
+]
+
+var position_in_deck = -sample_deck.size() - 1; # will have 1 added to it before displaying;
+
 var deck: Array[directions] = [];
 
 var data: Dictionary = {
@@ -70,11 +78,15 @@ func _ready() -> void:
 			data[key]["orthogonal"] = false;
 	clear_data_samples();
 
+	update_deck_display();
+
 func _physics_process(_delta) -> void:
 	
 	if allow_input and Input.is_action_just_pressed("record"):
 		var raw_left_stick_vector: Vector2 = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down");
 		print(rad_to_deg(raw_left_stick_vector.angle_to(data[directions.r].vector)));
+
+		update_deck_display();
 
 
 func clear_data_samples() -> void:
@@ -90,5 +102,16 @@ func clear_data_samples() -> void:
 		composite_data[key]["mu"] = 0.0;
 		composite_data[key]["sd"] = 0.0;
 		composite_data[key]["extreme"] = 0.0;
-	print(JSON.stringify(data, "\t"));
-	print(JSON.stringify(composite_data, "\t"));
+	# print(JSON.stringify(data, "\t"));
+	# print(JSON.stringify(composite_data, "\t"));
+
+func update_deck_display():
+	position_in_deck += 1;
+	if position_in_deck < 0:
+		current_direction = sample_deck[position_in_deck + sample_deck.size()];
+	else:
+		if position_in_deck < deck.size():
+			current_direction = deck[position_in_deck];
+		else:
+			return;
+	print(position_in_deck, " ", current_direction);

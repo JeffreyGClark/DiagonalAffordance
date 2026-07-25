@@ -1,15 +1,16 @@
-[gd_scene load_steps=4 format=3 uid="uid://ce3aeglmbh5co"]
+[gd_scene load_steps=5 format=3 uid="uid://ce3aeglmbh5co"]
 
 [ext_resource type="Script" uid="uid://ukv38lpxyue4" path="res://playing_surface.gd" id="1_pq8q7"]
-[ext_resource type="Texture2D" path="res://25BA.png" id="2_pyidc"]
+[ext_resource type="Texture2D" uid="uid://cw31q7ipamk84" path="res://RArrow.png" id="2_vvh5c"]
+[ext_resource type="Texture2D" uid="uid://c25o73af12dc1" path="res://PressedButton.png" id="3_28aoi"]
 [ext_resource type="Texture2D" uid="uid://32k6bnei4u0b" path="res://UnpressedButton.png" id="3_vvh5c"]
 
 [node name="root" type="Node2D"]
 
 [node name="Backdrop" type="Polygon2D" parent="."]
 color = Color(0, 0, 0, 1)
-polygon = PackedVector2Array(247, -27.5)
-uv = PackedVector2Array(247, -27.5)
+polygon = PackedVector2Array(0, 0, 320, 0, 320, 180, 0, 180)
+uv = PackedVector2Array(0, 0, 320, 0, 320, 180, 0, 180)
 
 [node name="PlayingSurface" type="Node2D" parent="."]
 script = ExtResource("1_pq8q7")
@@ -17,14 +18,14 @@ script = ExtResource("1_pq8q7")
 [node name="Direction" type="Sprite2D" parent="PlayingSurface"]
 position = Vector2(129, 87)
 scale = Vector2(2, 2)
-texture = ExtResource("2_pyidc")
+texture = ExtResource("2_vvh5c")
 
 [node name="Node2D" type="Node2D" parent="PlayingSurface"]
 position = Vector2(151, 78)
 
 [node name="LButton" type="Sprite2D" parent="PlayingSurface/Node2D"]
 scale = Vector2(2, 2)
-texture = ExtResource("3_vvh5c")
+texture = ExtResource("3_28aoi")
 centered = false
 
 [node name="UButton" type="Sprite2D" parent="PlayingSurface/Node2D"]
