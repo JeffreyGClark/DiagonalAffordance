@@ -1,6 +1,7 @@
-[gd_scene load_steps=2 format=3 uid="uid://ce3aeglmbh5co"]
+[gd_scene load_steps=3 format=3 uid="uid://ce3aeglmbh5co"]
 
 [ext_resource type="Script" uid="uid://ukv38lpxyue4" path="res://playing_surface.gd" id="1_pq8q7"]
+[ext_resource type="Texture2D" uid="uid://dbo7geyxes7df" path="res://25BA.png" id="2_pyidc"]
 
 [node name="root" type="Node2D"]
 
@@ -10,3 +11,9 @@ polygon = PackedVector2Array(0, 0, 320, 0, 320, 180, 0, 180)
 
 [node name="PlayingSurface" type="Node2D" parent="."]
 script = ExtResource("1_pq8q7")
+
+[node name="Direction" type="Sprite2D" parent="PlayingSurface"]
+texture = ExtResource("2_pyidc")
+centered = false
+
+[node name="Button" type="Sprite2D" parent="PlayingSurface"]

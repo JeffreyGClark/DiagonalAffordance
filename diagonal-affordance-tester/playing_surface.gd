@@ -76,9 +76,6 @@ func _physics_process(_delta) -> void:
 		var raw_left_stick_vector: Vector2 = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down");
 		print(rad_to_deg(raw_left_stick_vector.angle_to(data[directions.r].vector)));
 
-		
-	# print(raw_left_stick_vector, " ", rad_to_deg(raw_left_stick_vector.angle()));
-	# if absf(raw_left_stick_vector[0]) > 0.383: # sin 22.5 degrees
 
 func clear_data_samples() -> void:
 	for key in data:
