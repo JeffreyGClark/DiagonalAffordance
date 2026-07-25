@@ -1,5 +1,7 @@
 extends Node2D
 
+var allow_input: bool = true;
+
 enum directions {
 	r,
 	ur,
@@ -11,52 +13,54 @@ enum directions {
 	dr
 }
 
+var deck: Array[directions] = [];
+
 var data: Dictionary = {
 	directions.r: {
+		"direction": "r",
 		"vector": Vector2(1, 0)
 	},
 	directions.ur: {
+		"direction": "ur",
 		"vector": Vector2(1, -1)
 	},
 	directions.u: {
+		"direction": "u",
 		"vector": Vector2(0, -1)
 	},
 	directions.ul: {
+		"direction": "ul",
 		"vector": Vector2(-1, -1)
 	},
 	directions.l: {
+		"direction": "l",
 		"vector": Vector2(-1, 0)
 	},
 	directions.dl: {
+		"direction": "dl",
 		"vector": Vector2(-1, 1)
 	},
 	directions.d: {
+		"direction": "d",
 		"vector": Vector2(0, -1)
 	},
 	directions.dr: {
+		"direction": "dr",
 		"vector": Vector2(1, -1)
 	},
 }
 
 var composite_data: Dictionary = {
-	"orthogonal": {
-		"mu": 0.0,
-		"sd": 0.0,
-		"extreme": 0.0,
-	},
-	"diagonal": {
-		"mu": 0.0,
-		"sd": 0.0,
-		"extreme": 0.0,
-	},
-	"all": {
-		"mu": 0.0,
-		"sd": 0.0,
-		"extreme": 0.0,
-	}
+	"orthogonal": {},
+	"diagonal": {},
+	"all": {}
 }
 
 func _ready() -> void:
+	for direction in directions.values():
+		for i in 6:
+			deck.push_back(direction);
+	deck.shuffle();
 	for key in data:
 		data[key]["angle_degrees"] = rad_to_deg(data[key].vector.angle());
 		var vec = data[key].vector;
@@ -65,18 +69,27 @@ func _ready() -> void:
 		else:
 			data[key]["orthogonal"] = false;
 	clear_data_samples();
-	print(data);
 
 func _physics_process(_delta) -> void:
-	var raw_left_stick_vector: Vector2 = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down");
+	
+	if allow_input and Input.is_action_just_pressed("record"):
+		var raw_left_stick_vector: Vector2 = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down");
+		print(rad_to_deg(raw_left_stick_vector.angle_to(data[directions.r].vector)));
+
+		
 	# print(raw_left_stick_vector, " ", rad_to_deg(raw_left_stick_vector.angle()));
 	# if absf(raw_left_stick_vector[0]) > 0.383: # sin 22.5 degrees
 
 func clear_data_samples() -> void:
 	for key in data:
 		data[key]["samples"] = [];
-		data[key]["mu"] = [];
-		data[key]["sd"] = [];
-		data[key]["extremes"] = [];
+		data[key]["mu"] = 0.0;
+		data[key]["sd"] = 0.0;
+		data[key]["extreme"] = 0.0;
 	for key in composite_data:
-		print(key, " ", composite_data[key]);
+		composite_data[key]["samples"] = [];
+		composite_data[key]["mu"] = 0.0;
+		composite_data[key]["sd"] = 0.0;
+		composite_data[key]["extreme"] = 0.0;
+	print(JSON.stringify(data, "\t"));
+	print(JSON.stringify(composite_data, "\t"));
