@@ -1,19 +1,46 @@
-[gd_scene load_steps=3 format=3 uid="uid://ce3aeglmbh5co"]
+[gd_scene load_steps=4 format=3 uid="uid://ce3aeglmbh5co"]
 
 [ext_resource type="Script" uid="uid://ukv38lpxyue4" path="res://playing_surface.gd" id="1_pq8q7"]
-[ext_resource type="Texture2D" uid="uid://dbo7geyxes7df" path="res://25BA.png" id="2_pyidc"]
+[ext_resource type="Texture2D" path="res://25BA.png" id="2_pyidc"]
+[ext_resource type="Texture2D" uid="uid://32k6bnei4u0b" path="res://UnpressedButton.png" id="3_vvh5c"]
 
 [node name="root" type="Node2D"]
 
 [node name="Backdrop" type="Polygon2D" parent="."]
 color = Color(0, 0, 0, 1)
-polygon = PackedVector2Array(0, 0, 320, 0, 320, 180, 0, 180)
+polygon = PackedVector2Array(247, -27.5)
+uv = PackedVector2Array(247, -27.5)
 
 [node name="PlayingSurface" type="Node2D" parent="."]
 script = ExtResource("1_pq8q7")
 
 [node name="Direction" type="Sprite2D" parent="PlayingSurface"]
+position = Vector2(129, 87)
+scale = Vector2(2, 2)
 texture = ExtResource("2_pyidc")
+
+[node name="Node2D" type="Node2D" parent="PlayingSurface"]
+position = Vector2(151, 78)
+
+[node name="LButton" type="Sprite2D" parent="PlayingSurface/Node2D"]
+scale = Vector2(2, 2)
+texture = ExtResource("3_vvh5c")
 centered = false
 
-[node name="Button" type="Sprite2D" parent="PlayingSurface"]
+[node name="UButton" type="Sprite2D" parent="PlayingSurface/Node2D"]
+position = Vector2(11, -12)
+scale = Vector2(2, 2)
+texture = ExtResource("3_vvh5c")
+centered = false
+
+[node name="RButton" type="Sprite2D" parent="PlayingSurface/Node2D"]
+position = Vector2(22, 0)
+scale = Vector2(2, 2)
+texture = ExtResource("3_vvh5c")
+centered = false
+
+[node name="DButton" type="Sprite2D" parent="PlayingSurface/Node2D"]
+position = Vector2(11, 12)
+scale = Vector2(2, 2)
+texture = ExtResource("3_vvh5c")
+centered = false

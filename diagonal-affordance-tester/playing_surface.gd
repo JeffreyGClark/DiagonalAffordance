@@ -80,11 +80,13 @@ func _physics_process(_delta) -> void:
 func clear_data_samples() -> void:
 	for key in data:
 		data[key]["samples"] = [];
+		data[key]["latency"] = [];
 		data[key]["mu"] = 0.0;
 		data[key]["sd"] = 0.0;
 		data[key]["extreme"] = 0.0;
 	for key in composite_data:
 		composite_data[key]["samples"] = [];
+		composite_data[key]["latency"] = [];
 		composite_data[key]["mu"] = 0.0;
 		composite_data[key]["sd"] = 0.0;
 		composite_data[key]["extreme"] = 0.0;
