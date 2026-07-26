@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://cw31q7ipamk84"
-path="res://.godot/imported/RArrow.png-41a8d50ee5b66b03663e8885c43a6a5f.ctex"
+uid="uid://61mrp0yy37qw"
+path="res://.godot/imported/RightArrow.png-0ccb8c324bdf7c1ed02e3dbb2aca7075.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://RArrow.png"
-dest_files=["res://.godot/imported/RArrow.png-41a8d50ee5b66b03663e8885c43a6a5f.ctex"]
+source_file="res://RightArrow.png"
+dest_files=["res://.godot/imported/RightArrow.png-0ccb8c324bdf7c1ed02e3dbb2aca7075.ctex"]
 
 [params]
 

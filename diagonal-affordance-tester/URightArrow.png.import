@@ -2,16 +2,16 @@
 
 importer="texture"
 type="CompressedTexture2D"
-uid="uid://b0jla5su3m6ai"
-path="res://.godot/imported/URArrow.png-068bc5505004be9f75a7da8fca688ad8.ctex"
+uid="uid://vprh1bjtcj25"
+path="res://.godot/imported/URightArrow.png-5e161483c30e402332e41956aa8810b4.ctex"
 metadata={
 "vram_texture": false
 }
 
 [deps]
 
-source_file="res://URArrow.png"
-dest_files=["res://.godot/imported/URArrow.png-068bc5505004be9f75a7da8fca688ad8.ctex"]
+source_file="res://URightArrow.png"
+dest_files=["res://.godot/imported/URightArrow.png-5e161483c30e402332e41956aa8810b4.ctex"]
 
 [params]
 

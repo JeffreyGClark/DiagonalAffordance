@@ -4,8 +4,8 @@ extends Node2D
 @onready var _Direction: Sprite2D = $"./Direction";
 
 # textures
-const RArrow: Texture2D = preload("res://RArrow.png");
-const URArrow: Texture2D = preload("res://URArrow.png");
+const RArrow: Texture2D = preload("res://RightArrow.png");
+const URArrow: Texture2D = preload("res://URightArrow.png");
 
 var allow_input: bool = true;
 
@@ -57,11 +57,11 @@ var data: Dictionary = {
 	},
 	directions.d: {
 		"direction": "d",
-		"vector": Vector2(0, -1)
+		"vector": Vector2(0, 1)
 	},
 	directions.dr: {
 		"direction": "dr",
-		"vector": Vector2(1, -1)
+		"vector": Vector2(1, 1)
 	},
 }
 
@@ -73,7 +73,7 @@ var composite_data: Dictionary = {
 
 func _ready() -> void:
 	for direction in directions.values():
-		for i in 6:
+		for i in 2:
 			deck.push_back(direction);
 	deck.shuffle();
 	for key in data:
@@ -91,7 +91,11 @@ func _physics_process(_delta) -> void:
 	
 	if allow_input and Input.is_action_just_pressed("record"):
 		var raw_left_stick_vector: Vector2 = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down");
-		print(rad_to_deg(raw_left_stick_vector.angle_to(data[directions.r].vector)));
+		var error_angle: float = rad_to_deg(raw_left_stick_vector.angle_to(data[current_direction].vector));
+
+		input_received_visual();
+
+		save_value(error_angle);
 
 		update_deck_display();
 
@@ -99,20 +103,26 @@ func _physics_process(_delta) -> void:
 func clear_data_samples() -> void:
 	for key in data:
 		data[key]["samples"] = [];
-		data[key]["latency"] = [];
+		# data[key]["latency"] = [];
 		data[key]["mu"] = 0.0;
 		data[key]["sd"] = 0.0;
 		data[key]["extreme"] = 0.0;
+		data[key]["row"] = "";
 	for key in composite_data:
 		composite_data[key]["samples"] = [];
-		composite_data[key]["latency"] = [];
+		# composite_data[key]["latency"] = [];
 		composite_data[key]["mu"] = 0.0;
 		composite_data[key]["sd"] = 0.0;
 		composite_data[key]["extreme"] = 0.0;
+		composite_data[key]["row"] = 0.0;
 	# print(JSON.stringify(data, "\t"));
 	# print(JSON.stringify(composite_data, "\t"));
 
+func input_received_visual():
+	
+
 func update_deck_display():
+	# save data
 	position_in_deck += 1;
 	if position_in_deck < 0:
 		current_direction = sample_deck[position_in_deck + sample_deck.size()];
@@ -120,7 +130,7 @@ func update_deck_display():
 		if position_in_deck < deck.size():
 			current_direction = deck[position_in_deck];
 		else:
-			return;
+			finish();
   
 	if (current_direction % 2 == 0):
 		_Direction.texture = RArrow;
@@ -129,6 +139,96 @@ func update_deck_display():
 		_Direction.texture = URArrow;
 		_Direction.rotation_degrees = data[current_direction].angle_degrees + 45.0;
 
+	# print(position_in_deck, " ", current_direction, " ", data[current_direction].angle_degrees);
+	# print("  ", _Direction.position);
+
+func save_value(error: float) -> void:
+	print("%3d" % (current_direction * 45), ": ", error);
+	if position_in_deck >= 0 and position_in_deck < deck.size():
+		data[current_direction]["samples"].push_back(error);
+
+func finish() -> void:
+	allow_input = false;
+	var orthogonal_samples = [];
+	var diagonal_samples = [];
+	var all_samples = [];
+	for direction in directions.values():
+		var direction_angle: String = "%3d" % (direction * 45);
+		var output_row: String = "(" + direction_angle + ")";
+		var samples_string: String = "[ ";
+		var max_error: float = 0.0;
+		var samples: Array = data[direction]["samples"];
+		var mean: float = find_mean(samples);
+		var std: float = find_std(samples, mean);
+		for sample in samples:
+			if direction % 2 == 0:
+				orthogonal_samples.push_back(sample);
+			else:
+				diagonal_samples.push_back(sample);
+			all_samples.push_back(sample);
+
+			samples_string += "%.1f" % sample + ", ";
+			if abs(sample) > max_error:
+				max_error = abs(sample);
+
+		output_row += " " + char(0x00B5) + ": " + ("%5.1f" % mean);
+		output_row += " sd: " + ("%5.1f" % std);
+		output_row += " max: " + ("%5.1f" % max_error);
+		output_row += " " + samples_string.left(-2) + "]"
+		print(output_row);
+
+	var diag_mean: float = find_mean(diagonal_samples);
+	var diag_std: float = find_std(diagonal_samples, diag_mean);
+	var diag_max: float = find_max(diagonal_samples);
+	var diag_row: String = "(diag) " + \
+		char(0x00B5) + ": " + ("%5.1f" % diag_mean) + \
+		" sd: " + ("%5.1f" % diag_std) + \
+		" max: " + ("%5.1f" % diag_max);
+	print(diag_row);
+
+	var orth_mean: float = find_mean(orthogonal_samples);
+	var orth_std: float = find_std(orthogonal_samples, orth_mean);
+	var orth_max: float = find_max(orthogonal_samples);
+	var orth_row: String = "(orth) " + \
+		char(0x00B5) + ": " + ("%5.1f" % orth_mean) + \
+		" sd: " + ("%5.1f" % orth_std) + \
+		" max: " + ("%5.1f" % orth_max);
+	print(orth_row);
+
+	var all_mean: float = find_mean(all_samples);
+	var all_std: float = find_std(all_samples, all_mean);
+	var all_max: float = find_max(all_samples);
+	var all_row: String = "( all) " + \
+		char(0x00B5) + ": " + ("%5.1f" % all_mean) + \
+		" sd: " + ("%5.1f" % all_std) + \
+		" max: " + ("%5.1f" % all_max);
+	print(all_row);
+
+	# print(JSON.stringify(data, "\t"));
+	# print(JSON.stringify(composite_data, "\t"));
+
+func find_max(array: Array) -> float:
+	var max_error: float = 0.0;
+	for num in array:
+		if abs(num) > max_error:
+			max_error = abs(num);
+	return max_error;
+
+func find_mean(array: Array) -> float:
+	var sum: float = 0.0;
+	for num in array:
+		sum += num;
 	
-	print(position_in_deck, " ", current_direction);
-	print("  ", _Direction.position);
+	return sum / array.size();
+
+func find_std(array: Array, mean: float = 0.0) -> float:
+	if is_zero_approx(mean):
+		mean = find_mean(array);
+
+	var sum_squares: float = 0.0;
+	var diff: float = 0;
+	for num in array:
+		diff = num - mean;
+		sum_squares += diff * diff;
+
+	return sqrt(sum_squares / (array.size() - 1));
