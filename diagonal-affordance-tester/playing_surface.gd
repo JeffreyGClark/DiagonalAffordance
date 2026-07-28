@@ -2,12 +2,16 @@ extends Node2D
 
 # nodes
 @onready var _Direction: Sprite2D = $"./Direction";
+@onready var _Node2D: Node2D = $"./Node2D";
+@onready var _Count: Label = $"./Control/Count";
+@onready var _Total: Label = $"./Control/Total";
 
 # textures
 const RArrow: Texture2D = preload("res://RightArrow.png");
 const URArrow: Texture2D = preload("res://URightArrow.png");
 
 var allow_input: bool = true;
+var finished: bool = false;
 
 enum directions {
 	r,
@@ -71,9 +75,11 @@ var composite_data: Dictionary = {
 	"all": {}
 }
 
+var card_repeats: int = 8;
+var count: int = -1;
 func _ready() -> void:
 	for direction in directions.values():
-		for i in 2:
+		for i in card_repeats:
 			deck.push_back(direction);
 	deck.shuffle();
 	for key in data:
@@ -87,6 +93,9 @@ func _ready() -> void:
 
 	update_deck_display();
 
+	_Count.text = str(count);
+	_Total.text = "/" + str(card_repeats * directions.size() + 3)
+
 func _physics_process(_delta) -> void:
 	
 	if allow_input and Input.is_action_just_pressed("record"):
@@ -98,6 +107,11 @@ func _physics_process(_delta) -> void:
 		save_value(error_angle);
 
 		update_deck_display();
+
+	else:
+		var raw_left_stick_vector: Vector2 = Input.get_vector("ui_left", "ui_right", "ui_up", "ui_down");
+		var error_angle: float = rad_to_deg(raw_left_stick_vector.angle_to(data[current_direction].vector));
+		# print(error_angle);
 
 
 func clear_data_samples() -> void:
@@ -119,11 +133,40 @@ func clear_data_samples() -> void:
 	# print(JSON.stringify(composite_data, "\t"));
 
 func input_received_visual():
+	_Direction.visible = false;
+	_Direction.modulate = Color.BLACK;
+	_Node2D.visible = false;
+	_Node2D.modulate = Color.BLACK;
+	allow_input = false;
 	
+	await get_tree().create_timer(0.2).timeout;
+
+	if finished:
+		return;
+
+	allow_input = true;
+	_Direction.visible = true;
+	_Node2D.visible = true;
+
+	get_tree().create_tween().tween_property(
+		_Direction,
+		"modulate",
+		Color.WHITE,
+		0.2
+	);
+	get_tree().create_tween().tween_property(
+		_Node2D,
+		"modulate",
+		Color.WHITE,
+		0.2
+	);
+
 
 func update_deck_display():
 	# save data
 	position_in_deck += 1;
+	count += 1;
+	_Count.text = str(count);
 	if position_in_deck < 0:
 		current_direction = sample_deck[position_in_deck + sample_deck.size()];
 	else:
@@ -139,15 +182,13 @@ func update_deck_display():
 		_Direction.texture = URArrow;
 		_Direction.rotation_degrees = data[current_direction].angle_degrees + 45.0;
 
-	# print(position_in_deck, " ", current_direction, " ", data[current_direction].angle_degrees);
-	# print("  ", _Direction.position);
-
 func save_value(error: float) -> void:
 	print("%3d" % (current_direction * 45), ": ", error);
 	if position_in_deck >= 0 and position_in_deck < deck.size():
 		data[current_direction]["samples"].push_back(error);
 
 func finish() -> void:
+	finished = true;
 	allow_input = false;
 	var orthogonal_samples = [];
 	var diagonal_samples = [];
@@ -176,6 +217,7 @@ func finish() -> void:
 		output_row += " max: " + ("%5.1f" % max_error);
 		output_row += " " + samples_string.left(-2) + "]"
 		print(output_row);
+		print("  ", find_over_225(samples));
 
 	var diag_mean: float = find_mean(diagonal_samples);
 	var diag_std: float = find_std(diagonal_samples, diag_mean);
@@ -185,6 +227,7 @@ func finish() -> void:
 		" sd: " + ("%5.1f" % diag_std) + \
 		" max: " + ("%5.1f" % diag_max);
 	print(diag_row);
+	print("  ", find_over_225(diagonal_samples));
 
 	var orth_mean: float = find_mean(orthogonal_samples);
 	var orth_std: float = find_std(orthogonal_samples, orth_mean);
@@ -194,6 +237,7 @@ func finish() -> void:
 		" sd: " + ("%5.1f" % orth_std) + \
 		" max: " + ("%5.1f" % orth_max);
 	print(orth_row);
+	print("  ", find_over_225(orthogonal_samples));
 
 	var all_mean: float = find_mean(all_samples);
 	var all_std: float = find_std(all_samples, all_mean);
@@ -203,6 +247,7 @@ func finish() -> void:
 		" sd: " + ("%5.1f" % all_std) + \
 		" max: " + ("%5.1f" % all_max);
 	print(all_row);
+	print("  ", find_over_225(all_samples));
 
 	# print(JSON.stringify(data, "\t"));
 	# print(JSON.stringify(composite_data, "\t"));
@@ -232,3 +277,11 @@ func find_std(array: Array, mean: float = 0.0) -> float:
 		sum_squares += diff * diff;
 
 	return sqrt(sum_squares / (array.size() - 1));
+
+func find_over_225(array: Array) -> Array:
+	var _count: int = 0;
+	for num in array:
+		if abs(num) > 22.5:
+			_count += 1;
+	
+	return [_count, float(_count) / float(array.size())];

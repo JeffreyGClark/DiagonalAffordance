@@ -1,9 +1,16 @@
-[gd_scene load_steps=5 format=3 uid="uid://ce3aeglmbh5co"]
+[gd_scene load_steps=8 format=3 uid="uid://ce3aeglmbh5co"]
 
 [ext_resource type="Script" uid="uid://ukv38lpxyue4" path="res://playing_surface.gd" id="1_pq8q7"]
 [ext_resource type="Texture2D" uid="uid://61mrp0yy37qw" path="res://RightArrow.png" id="2_28aoi"]
 [ext_resource type="Texture2D" uid="uid://c25o73af12dc1" path="res://PressedButton.png" id="3_28aoi"]
 [ext_resource type="Texture2D" uid="uid://32k6bnei4u0b" path="res://UnpressedButton.png" id="3_vvh5c"]
+[ext_resource type="FontFile" uid="uid://loaek3t5f3b6" path="res://Web437_IBM_EGA_8x8.woff" id="5_jnlp7"]
+
+[sub_resource type="LabelSettings" id="LabelSettings_jnlp7"]
+font = ExtResource("5_jnlp7")
+
+[sub_resource type="LabelSettings" id="LabelSettings_l8v81"]
+font = ExtResource("5_jnlp7")
 
 [node name="root" type="Node2D"]
 
@@ -45,3 +52,28 @@ position = Vector2(11, 12)
 scale = Vector2(2, 2)
 texture = ExtResource("3_vvh5c")
 centered = false
+
+[node name="Control" type="Control" parent="PlayingSurface"]
+layout_mode = 3
+anchors_preset = 0
+offset_right = 40.0
+offset_bottom = 40.0
+
+[node name="Count" type="Label" parent="PlayingSurface/Control"]
+layout_mode = 0
+offset_left = 227.0
+offset_top = 163.0
+offset_right = 271.0
+offset_bottom = 179.0
+text = "10"
+label_settings = SubResource("LabelSettings_jnlp7")
+horizontal_alignment = 2
+
+[node name="Total" type="Label" parent="PlayingSurface/Control"]
+layout_mode = 0
+offset_left = 271.0
+offset_top = 163.0
+offset_right = 319.0
+offset_bottom = 180.0
+text = "/64"
+label_settings = SubResource("LabelSettings_l8v81")
